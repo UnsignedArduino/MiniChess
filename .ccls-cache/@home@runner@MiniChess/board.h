@@ -28,8 +28,10 @@ class Board {
   public:
     Board();
 
-    void printBoard();
+    void printBoard(bool pretty = false);
 
   private:
     Piece board[8][8];
+
+    void printPrettyPiece(char algebraic);
 };

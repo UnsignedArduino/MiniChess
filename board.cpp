@@ -28,7 +28,7 @@ Board::Board() {
     }
   }
   for (uint8_t x = 0; x < 8; x ++) {
-    this->board[6][x] = Piece(BLACK_PAWN);
+    this->board[6][x] = Piece(WHITE_PAWN);
   }
   this->board[7][0] = Piece(WHITE_ROOK);
   this->board[7][1] = Piece(WHITE_KNIGHT);
@@ -40,12 +40,74 @@ Board::Board() {
   this->board[7][7] = Piece(WHITE_ROOK);
 }
 
-void Board::printBoard() {
+void Board::printBoard(bool pretty/* = false*/) {
   for (uint8_t y = 0; y < 8; y ++) {
     for (uint8_t x = 0; x < 8; x ++) {
-      printf("%c", this->board[y][x].type);
+      if (pretty) {
+        this->printPrettyPiece(this->board[y][x].type);
+      } else {
+        printf("%c", this->board[y][x].type);
+      }
       printf(" ");
     }
     printf("\n");
+  }
+}
+
+void Board::printPrettyPiece(char algebraic) {
+  switch (algebraic) {
+    case (WHITE_PAWN): {
+      printf("♙");
+      break;
+    }
+    case (BLACK_PAWN): {
+      printf("♟︎");
+      break;
+    }
+    case (WHITE_KNIGHT): {
+      printf("♘");
+      break;
+    }
+    case (BLACK_KNIGHT): {
+      printf("♞");
+      break;
+    }
+    case (WHITE_BISHOP): {
+      printf("♗");
+      break;
+    }
+    case (BLACK_BISHOP): {
+      printf("♝");
+      break;
+    }
+    case (WHITE_ROOK): {
+      printf("♖");
+      break;
+    }
+    case (BLACK_ROOK): {
+      printf("♜");
+      break;
+    }
+    case (WHITE_QUEEN): {
+      printf("♕");
+      break;
+    }
+    case (BLACK_QUEEN): {
+      printf("♛");
+      break;
+    }
+    case (WHITE_KING): {
+      printf("♔");
+      break;
+    }
+    case (BLACK_KING): {
+      printf("♚");
+      break;
+    }
+    default:
+    case (EMPTY): {
+      printf(" ");
+      break;
+    }
   }
 }
