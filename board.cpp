@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+using namespace std;
 
 void moveSet(uint16_t &move, uint8_t from, uint8_t to, uint8_t promo) {
   move = (uint16_t)from;
