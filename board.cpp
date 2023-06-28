@@ -2,112 +2,54 @@
 #include <string.h>
 #include <stdio.h>
 
-Piece::Piece() {
-  this->type = EMPTY;
-}
-
-Piece::Piece(char type) {
-  this->type = type;
-}
-
 Board::Board() {
-  this->board[0][0] = Piece(BLACK_ROOK);
-  this->board[0][1] = Piece(BLACK_KNIGHT);
-  this->board[0][2] = Piece(BLACK_BISHOP);
-  this->board[0][3] = Piece(BLACK_QUEEN);
-  this->board[0][4] = Piece(BLACK_KING);
-  this->board[0][5] = Piece(BLACK_BISHOP);
-  this->board[0][6] = Piece(BLACK_KNIGHT);
-  this->board[0][7] = Piece(BLACK_ROOK);
-  for (uint8_t x = 0; x < 8; x ++) {
-    this->board[1][x] = Piece(BLACK_PAWN);
-  }
-  for (uint8_t y = 2; y < 6; y ++) {
-    for (uint8_t x = 0; x < 8; x ++) {
-      this->board[y][x] = Piece(EMPTY);
-    }
-  }
-  for (uint8_t x = 0; x < 8; x ++) {
-    this->board[6][x] = Piece(WHITE_PAWN);
-  }
-  this->board[7][0] = Piece(WHITE_ROOK);
-  this->board[7][1] = Piece(WHITE_KNIGHT);
-  this->board[7][2] = Piece(WHITE_BISHOP);
-  this->board[7][3] = Piece(WHITE_QUEEN);
-  this->board[7][4] = Piece(WHITE_KING);
-  this->board[7][5] = Piece(WHITE_BISHOP);
-  this->board[7][6] = Piece(WHITE_KNIGHT);
-  this->board[7][7] = Piece(WHITE_ROOK);
+  this->whitePawns = 0x000000000000FF00;
+  this->blackPawns = 0x00FF000000000000;
+  this->whiteKnights = 0x0000000000000042;
+  this->blackKnights = 0x4200000000000000;
+  this->whiteBishops = 0;
+  this->blackBishops = 0;
+  this->whiteRooks = 0;
+  this->blackRooks = 0;
+  this->whiteQueens = 0;
+  this->blackQueens = 0;
+  this->whiteKing = 0;
+  this->blackKing = 0;
 }
 
-void Board::printBoard(bool pretty/* = false*/) {
+void Board::printBoard() {
   for (uint8_t y = 0; y < 8; y ++) {
     for (uint8_t x = 0; x < 8; x ++) {
-      if (pretty) {
-        this->printPrettyPiece(this->board[y][x].type);
+      const uint8_t index = y * 8 + x;
+      if (bitRead(this->whitePawns, index)) {
+        printf("P");
+      } else if (bitRead(this->blackPawns, index)) {
+        printf("p");
+      } else if (bitRead(this->whiteKnights, index)) {
+        printf("N");
+      } else if (bitRead(this->blackKnights, index)) {
+        printf("n");
+      } else if (bitRead(this->whiteBishops, index)) {
+        printf("B");
+      } else if (bitRead(this->blackBishops, index)) {
+        printf("b");
+      } else if (bitRead(this->whiteRooks, index)) {
+        printf("R");
+      } else if (bitRead(this->blackRooks, index)) {
+        printf("r");
+      } else if (bitRead(this->whiteQueens, index)) {
+        printf("Q");
+      } else if (bitRead(this->blackQueens, index)) {
+        printf("q");
+      } else if (bitRead(this->whiteKing, index)) {
+        printf("K");
+      } else if (bitRead(this->blackKing, index)) {
+        printf("k");
       } else {
-        printf("%c", this->board[y][x].type);
+        printf(".");
       }
       printf(" ");
     }
     printf("\n");
-  }
-}
-
-void Board::printPrettyPiece(char algebraic) {
-  switch (algebraic) {
-    case (WHITE_PAWN): {
-      printf("♙");
-      break;
-    }
-    case (BLACK_PAWN): {
-      printf("♟︎");
-      break;
-    }
-    case (WHITE_KNIGHT): {
-      printf("♘");
-      break;
-    }
-    case (BLACK_KNIGHT): {
-      printf("♞");
-      break;
-    }
-    case (WHITE_BISHOP): {
-      printf("♗");
-      break;
-    }
-    case (BLACK_BISHOP): {
-      printf("♝");
-      break;
-    }
-    case (WHITE_ROOK): {
-      printf("♖");
-      break;
-    }
-    case (BLACK_ROOK): {
-      printf("♜");
-      break;
-    }
-    case (WHITE_QUEEN): {
-      printf("♕");
-      break;
-    }
-    case (BLACK_QUEEN): {
-      printf("♛");
-      break;
-    }
-    case (WHITE_KING): {
-      printf("♔");
-      break;
-    }
-    case (BLACK_KING): {
-      printf("♚");
-      break;
-    }
-    default:
-    case (EMPTY): {
-      printf(" ");
-      break;
-    }
   }
 }

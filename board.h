@@ -2,36 +2,28 @@
 
 #include <stdint.h>
 
-const char EMPTY = '.';
-const char WHITE_PAWN = 'P';
-const char BLACK_PAWN = 'p';
-const char WHITE_KNIGHT = 'N';
-const char BLACK_KNIGHT = 'n';
-const char WHITE_BISHOP = 'B';
-const char BLACK_BISHOP = 'b';
-const char WHITE_ROOK = 'R';
-const char BLACK_ROOK = 'r';
-const char WHITE_QUEEN = 'Q';
-const char BLACK_QUEEN = 'q';
-const char WHITE_KING = 'K';
-const char BLACK_KING = 'k';
-
-class Piece {
-  public:
-    Piece();
-    Piece(char type);
-
-    char type;
-};
+#define bitRead(value, bit) (((value) >> (63 - bit)) & 0x01)
+#define bitSet(value, bit) ((value) |= (1UL << (63 - bit)))
+#define bitClear(value, bit) ((value) &= ~(1UL << (63 - bit)))
+#define bitWrite(value, bit, bitvalue) ((bitvalue) ? bitSet(value, 63 - bit) : bitClear(value, 63 - bit))
 
 class Board {
   public:
     Board();
 
-    void printBoard(bool pretty = false);
+    void printBoard();
 
   private:
-    Piece board[8][8];
-
-    void printPrettyPiece(char algebraic);
+    uint64_t whitePawns;
+    uint64_t blackPawns;
+    uint64_t whiteKnights;
+    uint64_t blackKnights;
+    uint64_t whiteBishops;
+    uint64_t blackBishops;
+    uint64_t whiteRooks;
+    uint64_t blackRooks;
+    uint64_t whiteQueens;
+    uint64_t blackQueens;
+    uint64_t whiteKing;
+    uint64_t blackKing;
 };
