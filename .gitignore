@@ -1,0 +1,5 @@
+.ccls-cache/*
+*.o
+main
+.replit
+replit.nix

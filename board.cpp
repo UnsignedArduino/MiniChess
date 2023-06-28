@@ -27,8 +27,13 @@ Board::Board() {
   this->blackRooks = 0x8100000000000000;
   this->whiteQueens = 0x0000000000000010;
   this->blackQueens = 0x1000000000000000;
-  this->whiteKing = 0x000000000000000F;
-  this->blackKing = 0x0F00000000000000;
+  this->whiteKing = 0x000000000000008;
+  this->blackKing = 0x800000000000000;
+
+  this->whitePawns = 0x00FF000000000000;
+  this->blackPawns = 0;
+  this->blackRooks = 0;
+  this->blackKing = 0;
 
   getLegalWhitePawnMoves();
 }
