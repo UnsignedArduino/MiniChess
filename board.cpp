@@ -2,8 +2,6 @@
 #include <cmath>
 #include <stdio.h>
 #include <string.h>
-#include <vector>
-#include <iostream>
 
 using namespace std;
 
@@ -33,12 +31,7 @@ Board::Board() {
   this->whiteKing = 0x000000000000008;
   this->blackKing = 0x800000000000000;
 
-  this->whitePawns = 0x00FF000000000000;
-  this->blackPawns = 0;
-  this->blackRooks = 0;
-  this->blackKing = 0;
-
-  getLegalWhitePawnMoves();
+  this->getLegalWhitePawnMoves();
 }
 
 bool Board::pieceAtIndex(uint8_t i) {
@@ -57,50 +50,6 @@ bool Board::pieceAtBitBoard(uint64_t bb) {
          this->whiteRooks & bb || this->blackRooks & bb ||
          this->whiteQueens & bb || this->blackQueens & bb ||
          this->whiteKing & bb || this->blackKing & bb;
-}
-
-std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
-  std::vector<uint16_t> legal;
-  // Get pawn pushes first (single)
-  // First copy the white pawn BB
-  uint64_t whitePawnCpy = this->whitePawns;
-  // Isolated pawn BB
-  // Set all bits to 0 besides the LS 1
-  uint64_t isolatedPawn = whitePawnCpy & ((~whitePawnCpy) + 1); // Black Magic;
-
-  // Check through all the other BBs and make sure no piece is in
-  // front of this pawn
-
-  // First shift this bit backwards by 8...?
-  const uint64_t possiblePawnPush = isolatedPawn << 8;
-
-  // Use & to see if any other BB has a 1 there
-  if (!this->pieceAtBitBoard(possiblePawnPush)) {
-    // Step 1: Find index of origin square (isolatedPawn)
-    const uint8_t from = 63 - std::log2(isolatedPawn);
-    // Step 2: Find index of landing square (possiblePawnPush)
-    const uint8_t to = 63 - std::log2(possiblePawnPush);
-    // Step 3: Check if it can promote
-    const bool canPromote = to < 8;
-    if (canPromote) {
-      uint16_t move;
-      for (uint8_t i = 0; i < 4; i ++) {
-        moveSet(move, from, to, i);
-        std::cout << std::format("{:b}", move);
-        legal.push_back(move);
-      }
-    } else {
-      legal.push_back(movePack(from, to, 0));
-    }
-  }
-  printf("%d\n", legal.size());
-  // 00 00 101111 110111
-  // 00 01 101111 110111
-  
-  // For testing purpose
-  // this->whitePawns = possiblePawnPush & blackPawns;
-
-  return legal;
 }
 
 void Board::printBoard() {
