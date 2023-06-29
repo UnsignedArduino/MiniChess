@@ -24,8 +24,10 @@ class Board {
     Board();
 
     bool pieceAtIndex(uint8_t i);
-    bool pieceAtBitBoard(uint64_t bb);
 
+    bool pieceAtBitBoard(uint64_t bb);
+    bool whitePieceAtBitBoard(uint64_t bb);
+    bool blackPieceAtBitBoard(uint64_t bb);
 
     std::vector<uint16_t> getLegalWhitePawnMoves();
 

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <string.h>
+#include <bitset>
 
 using namespace std;
 
@@ -31,6 +32,10 @@ Board::Board() {
   this->whiteKing = 0x000000000000008;
   this->blackKing = 0x800000000000000;
 
+  // this->whitePawns = 0x0000FF0000000000;
+  // this->blackPawns = 0;
+  // this->blackRooks = 0;
+
   this->getLegalWhitePawnMoves();
 }
 
@@ -50,6 +55,24 @@ bool Board::pieceAtBitBoard(uint64_t bb) {
          this->whiteRooks & bb || this->blackRooks & bb ||
          this->whiteQueens & bb || this->blackQueens & bb ||
          this->whiteKing & bb || this->blackKing & bb;
+}
+
+bool Board::whitePieceAtBitBoard(uint64_t bb) {
+  return this->whitePawns & bb ||
+         this->whiteKnights & bb ||
+         this->whiteBishops & bb ||
+         this->whiteRooks & bb ||
+         this->whiteQueens & bb ||
+         this->whiteKing & bb & bb;
+}
+
+bool Board::blackPieceAtBitBoard(uint64_t bb) {
+  return this->blackPawns & bb ||
+         this->blackKnights & bb ||
+         this->blackBishops & bb ||
+         this->blackRooks & bb ||
+         this->blackQueens & bb ||
+         this->blackKing & bb & bb;
 }
 
 void Board::printBoard() {
