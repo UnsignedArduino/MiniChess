@@ -36,12 +36,16 @@ class Board {
 
     uint64_t getFileAttacks(uint64_t bitMask, uint16_t from);
     uint64_t getRankAttacks(uint64_t bitMask);
+    uint64_t getDiagonalAttacks(uint64_t bitMask, uint16_t from);
 
     std::vector<uint16_t> getLegalWhitePawnMoves();
     std::vector<uint16_t> getLegalBlackPawnMoves();
 
     std::vector<uint16_t> getLegalWhiteRookMoves();
     std::vector<uint16_t> getLegalBlackRookMoves();
+
+    std::vector<uint16_t> getLegalWhiteBishopMoves();
+    std::vector<uint16_t> getLegalBlackBishopMoves();
 
     void printBoard();
     void printBitBoard(uint64_t bb);

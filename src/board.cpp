@@ -58,13 +58,14 @@ Board::Board() {
   this->whiteKing = 0x000000000000008ULL;
   this->blackKing = 0x800000000000000ULL;
 
-  this->whiteRooks = 0x0000000081000000ULL << 3;
-  this->whitePawns = 0x000000010100FF00ULL;
+  this->whiteBishops = 0x0000000000000024ULL << 24;
+  // this->whiteRooks = 0x0000000081000000ULL << 3;
+  // this->whitePawns = 0x000000010100FF00ULL;
   // this->blackPawns = 0x0000000000FF0000;
   // this->blackPawns = 0;
   // this->blackRooks = 0;
 
-  this->getLegalBlackRookMoves();
+  this->getLegalBlackBishopMoves();
 }
 
 bool Board::pieceAtIndex(uint8_t i) {
@@ -181,6 +182,37 @@ uint64_t Board::getRankAttacks(uint64_t bitMask){
   forward ^= bitReverse(reverse);
   forward &= fileMaskEx;
   return rotateAnti90(forward);
+}
+
+uint64_t Board::getDiagonalAttacks(uint64_t bitMask, uint16_t from){
+  uint64_t diagonalMaskEx;
+  int diag = 7-((63 - from) & 7) - ((63 - from) >> 3);
+  diagonalMaskEx = diag >= 0 ? 0x0102040810204080ULL >> diag*8 : 0x0102040810204080ULL << -diag*8;
+  diagonalMaskEx &= ~bitMask;
+
+  uint64_t antidiagMaskEx;
+  diag = ((63 - from) & 7) - ((63 - from) >> 3);
+  antidiagMaskEx = diag >= 0 ? 0x8040201008040201ULL >> diag*8 : 0x8040201008040201ULL << -diag*8;
+  antidiagMaskEx &= ~bitMask;
+
+  uint64_t occ = combinedOccupationBitBoard();
+  // Positive Diagonal attacks
+  uint64_t forward, reverse;
+  forward = occ & diagonalMaskEx;
+  reverse  = bitReverse(forward);
+  forward -= bitMask;
+  reverse -= bitReverse(bitMask);
+  forward ^= bitReverse(reverse);
+  forward &= diagonalMaskEx;
+  // Anti Diagonal Attacks
+  uint64_t forward2, reverse2;
+  forward2  = occ & antidiagMaskEx;
+  reverse2  = bitReverse(forward2);
+  forward2 -= bitMask;
+  reverse2 -= bitReverse(bitMask);
+  forward2 ^= bitReverse(reverse2);
+  forward2 &= antidiagMaskEx;
+  return forward + forward2;
 }
 
 void Board::printBitBoard(uint64_t bb) {
