@@ -12,10 +12,8 @@ std::vector<uint16_t> Board::getLegalWhiteQueenMoves(){
 
     uint64_t whiteQueensCpy = whiteQueens;
 
-    uint64_t isolatedQueen = whiteQueensCpy & ((~whiteQueensCpy) + 1);
-
     while (whiteQueensCpy != 0){
-        
+        uint64_t isolatedQueen = whiteQueensCpy & ((~whiteQueensCpy) + 1);
         uint8_t from = 63 - __builtin_ctzll(isolatedQueen);
 
         uint64_t attacks = getFileAttacks(isolatedQueen, from) | getRankAttacks(isolatedQueen) | getDiagonalAttacks(isolatedQueen, from);
@@ -40,10 +38,8 @@ std::vector<uint16_t> Board::getLegalBlackQueenMoves(){
 
     uint64_t blackQueensCpy = blackQueens;
 
-    uint64_t isolatedQueen = blackQueensCpy & ((~blackQueensCpy) + 1);
-
     while (blackQueensCpy != 0){
-        
+        uint64_t isolatedQueen = blackQueensCpy & ((~blackQueensCpy) + 1);
         uint8_t from = 63 - __builtin_ctzll(isolatedQueen);
 
         uint64_t attacks = getFileAttacks(isolatedQueen, from) | getRankAttacks(isolatedQueen) | getDiagonalAttacks(isolatedQueen, from);
