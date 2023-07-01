@@ -64,7 +64,7 @@ Board::Board() {
   // this->blackPawns = 0;
   // this->blackRooks = 0;
 
-  this->getLegalWhiteRookMoves();
+  this->getLegalBlackRookMoves();
 }
 
 bool Board::pieceAtIndex(uint8_t i) {
