@@ -30,7 +30,7 @@ std::vector<uint16_t> Board::getLegalWhiteRookMoves() {
     whiteRookCpy &= ~isolatedRook;
   }
 
-  printf("%d\n", legal.size());
+  // printf("%d\n", legal.size());
   return legal;
 }
 
@@ -58,6 +58,6 @@ std::vector<uint16_t> Board::getLegalBlackRookMoves() {
     blackRookCpy &= ~isolatedRook;
   }
 
-  printf("%d\n", legal.size());
+  // printf("%d\n", legal.size());
   return legal;
 }

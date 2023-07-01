@@ -58,6 +58,7 @@ Board::Board() {
   this->whiteKing = 0x000000000000008ULL;
   this->blackKing = 0x800000000000000ULL;
 
+  // this->blackKing >>= 24;
   // this->whiteQueens <<= 24;
   // this->whiteBishops = 0x0000000000000024ULL << 24;
   // this->whiteRooks = 0x0000000081000000ULL << 3;
@@ -68,6 +69,7 @@ Board::Board() {
 
   // this->getLegalWhiteBishopMoves();
   // this->getLegalBlackQueenMoves();
+  // this->getLegalBlackKingMoves();
 }
 
 bool Board::pieceAtIndex(uint8_t i) {

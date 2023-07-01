@@ -29,7 +29,8 @@ std::vector<uint16_t> Board::getLegalWhiteBishopMoves(){
         whiteBishopsCpy &= ~isolatedBishop;
     }
   
-    printf("%d\n", legal.size());
+    // printf("%d\n", legal.size());
+    return legal;
 }
 
 std::vector<uint16_t> Board::getLegalBlackBishopMoves(){
@@ -56,4 +57,5 @@ std::vector<uint16_t> Board::getLegalBlackBishopMoves(){
     }
   
     // printf("%d\n", legal.size());
+    return legal;
 }

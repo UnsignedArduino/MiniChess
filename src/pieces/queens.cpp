@@ -32,6 +32,7 @@ std::vector<uint16_t> Board::getLegalWhiteQueenMoves(){
         whiteQueensCpy &= ~isolatedQueen;
     }
     // printf("%d\n", legal.size());
+    return legal;
 }
 
 std::vector<uint16_t> Board::getLegalBlackQueenMoves(){
@@ -59,4 +60,5 @@ std::vector<uint16_t> Board::getLegalBlackQueenMoves(){
         blackQueensCpy &= ~isolatedQueen;
     }
     // printf("%d\n", legal.size());
+    return legal;
 }
