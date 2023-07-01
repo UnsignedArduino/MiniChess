@@ -1,5 +1,4 @@
 #include "../board.h"
-#include <bits/stdc++.h>
 #include <bitset>
 #include <cmath>
 #include <iostream>
@@ -18,19 +17,19 @@ std::vector<uint16_t> Board::getLegalWhiteBishopMoves(){
 
         uint64_t attacks = getDiagonalAttacks(isolatedBishop, from);
         while (attacks != 0){
-        uint64_t singleAttackSquare = attacks & ((~attacks) + 1);
-        if (!whitePieceAtBitBoard(singleAttackSquare)){
-            uint16_t move = movePack(from, 63-__builtin_ctzll(singleAttackSquare), false, false, 0, blackPieceAtBitBoard(singleAttackSquare), 0);
-            // std::bitset<16> x(move);
-            // std::cout << x << '\n';
-            legal.push_back(move);
-        }
-        attacks &= ~singleAttackSquare; //37, 46
+            uint64_t singleAttackSquare = attacks & ((~attacks) + 1);
+            if (!whitePieceAtBitBoard(singleAttackSquare)){
+                uint16_t move = movePack(from, 63-__builtin_ctzll(singleAttackSquare), false, false, 0, blackPieceAtBitBoard(singleAttackSquare), 0);
+                // std::bitset<16> x(move);
+                // std::cout << x << '\n';
+                legal.push_back(move);
+            }
+            attacks &= ~singleAttackSquare; //37, 46
         }
         whiteBishopsCpy &= ~isolatedBishop;
     }
   
-    // printf("%d\n", legal.size());
+    printf("%d\n", legal.size());
 }
 
 std::vector<uint16_t> Board::getLegalBlackBishopMoves(){

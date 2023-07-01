@@ -47,6 +47,9 @@ class Board {
     std::vector<uint16_t> getLegalWhiteBishopMoves();
     std::vector<uint16_t> getLegalBlackBishopMoves();
 
+    std::vector<uint16_t> getLegalWhiteQueenMoves();
+    std::vector<uint16_t> getLegalBlackQueenMoves();
+
     void printBoard();
     void printBitBoard(uint64_t bb);
 
