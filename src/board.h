@@ -73,7 +73,7 @@ class Board {
     void printBoard();
     void printBitBoard(uint64_t bb);
 
-  private:
+  
     uint64_t whitePawns;
     uint64_t blackPawns;
     uint64_t whiteKnights;
@@ -98,4 +98,9 @@ class Board {
     bool previousWhiteCastleQueen = 0;
     bool previousBlackCastleKing = 0;
     bool previousBlackCastleQueen = 0;
+
+    bool canPrevWhiteCastleKing = 0;
+    bool canPrevWhiteCastleQueen = 0;
+    bool canPrevBlackCastleKing = 0;
+    bool canPrevBlackCastleQueen = 0;
 };

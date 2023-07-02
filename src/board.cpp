@@ -455,7 +455,7 @@ void Board::performMove(uint16_t move){
   }
   
   // knight Promo
-  // std::bitset<8> x(flag);
+  // std::bitset<16> x(move);
   // std::cout << "Flag:" << x << "\n";
   // printf("%d\n", fromPiece);
   if (flag == 0b1000 || flag == 0b1100){
@@ -482,7 +482,7 @@ void Board::performMove(uint16_t move){
     // Replace with promotion
     *bitboards[fromPiece <= 6 ? 4 : 10] |= toMask;
   }
-  else  if (flag != 0b0010 && flag == 0b0011){
+  else  if (flag != 0b0010 && flag != 0b0011){
     // Move Origin piece to its new spot
     *bitboards[fromPiece-1] = (*bitboards[fromPiece-1] & (~fromMask)) | toMask;
   }
@@ -492,11 +492,15 @@ void Board::performMove(uint16_t move){
       whiteKing = 0x000000000000002ULL;
       whiteRooks &= ~0x000000000000001ULL;
       whiteRooks |= 0x000000000000004ULL;
+      previousWhiteCastleKing = 1;
+      canPrevWhiteCastleKing = 1;
     }
     else{
       blackKing = 0x0800000000000000ULL >> 2;
       blackRooks &= ~(0x0800000000000000ULL >> 3);
       blackRooks |= 0x0800000000000000ULL >> 1;
+      previousBlackCastleKing = 1;
+      canPrevBlackCastleKing = 1;
     }
   }
   if (flag == 0b0011){
@@ -504,11 +508,15 @@ void Board::performMove(uint16_t move){
       whiteKing = 0x000000000000008ULL << 2;
       whiteRooks &= ~0x000000000000080ULL;
       whiteRooks |= 0x000000000000008ULL << 1;
+      previousWhiteCastleQueen = 1;
+      canPrevWhiteCastleQueen = 1;
     }
     else{
       blackKing = 0x0800000000000000ULL << 2;
       blackRooks &= ~0x8000000000000000ULL;
       blackRooks |= 0x0800000000000000ULL << 1;
+      previousBlackCastleQueen = 1;
+      canPrevBlackCastleQueen = 1;
     }
     
   }
@@ -517,19 +525,21 @@ void Board::performMove(uint16_t move){
   // Figure out castling flags
   if (bitRead(whiteRooks, 63) != 1 || whiteKing != 0x000000000000008ULL){
     canWhiteKingCastle = 0;
-    previousWhiteCastleKing = 1;
+    canPrevWhiteCastleKing = 1;
+    
   }
   if (bitRead(whiteRooks, 56) != 1 || whiteKing != 0x000000000000008ULL){
     canWhiteQueenCastle = 0;
-    previousWhiteCastleQueen = 1;
+    canPrevWhiteCastleQueen = 1;
   }
   if (bitRead(blackRooks, 7) != 1 || blackKing != 0x0800000000000000ULL){
     canBlackKingCastle = 0;
-    previousBlackCastleKing = 1;
+    canPrevBlackCastleKing = 1;
   }
   if (bitRead(blackRooks, 0) != 1 || blackKing != 0x0800000000000000ULL){
     canBlackQueenCastle = 0;
-    previousBlackCastleQueen = 1;
+    canPrevBlackCastleQueen = 1;
+    
   }
 
   // printBitBoard(whitePawns);
@@ -537,6 +547,7 @@ void Board::performMove(uint16_t move){
 }
 
 void Board::unMakeMove(){
+  //printBitBoard(blackRooks);
   uint8_t from = previousMove & 0b0000000000111111;
   uint8_t to = (previousMove & 0b0000111111000000) >> 6;
   uint8_t flag = (previousMove & 0b1111000000000000) >> 12;
@@ -586,6 +597,20 @@ void Board::unMakeMove(){
 
 
   // Figure out castling flags
+  // printf("Castle %d %d %d %d\n", previousWhiteCastleKing, previousWhiteCastleQueen, previousBlackCastleKing, previousBlackCastleQueen);
+  if (canPrevWhiteCastleKing){
+    canWhiteKingCastle = 1;
+  }
+  if (canPrevWhiteCastleQueen){
+    canWhiteQueenCastle = 1;
+  }
+  if (canPrevBlackCastleKing){
+    canBlackKingCastle = 1;
+  }
+  if (canPrevBlackCastleQueen){
+    canBlackQueenCastle = 1;
+  }
+
   if (previousWhiteCastleKing){
     canWhiteKingCastle = 1;
     whiteKing = 0x000000000000008ULL;
@@ -616,9 +641,15 @@ void Board::unMakeMove(){
   previousWhiteCastleQueen = 0;
   previousBlackCastleKing = 0;
   previousBlackCastleQueen = 0;
+  canPrevWhiteCastleKing = 0;
+  canPrevWhiteCastleQueen = 0;
+  canPrevBlackCastleKing = 0;
+  canPrevBlackCastleQueen = 0;
   previousCapture = 0b00000000;
   previousMovedPiece = 0b00000000;
   previousMove = 0b0000000000000000;
+
+  //printBitBoard(blackRooks);
 }
 
 bool Board::pieceAtIndex(uint8_t i) {
