@@ -28,6 +28,12 @@ class Board {
     bool pieceAtBitBoard(uint64_t bb);
     bool whitePieceAtBitBoard(uint64_t bb);
     bool blackPieceAtBitBoard(uint64_t bb);
+    bool isWhiteCheck();
+    bool isBlackCheck();
+
+    std::vector<uint16_t> legalWhiteMoves();
+    std::vector<uint16_t> legalBlackMoves();
+
     uint64_t combinedOccupationBitBoard();
     uint64_t bitReverse(uint64_t bb);
     uint64_t flipVertical(uint64_t bb);
@@ -37,7 +43,9 @@ class Board {
     uint64_t getFileAttacks(uint64_t bitMask, uint16_t from);
     uint64_t getRankAttacks(uint64_t bitMask);
     uint64_t getDiagonalAttacks(uint64_t bitMask, uint16_t from);
+    
 
+    // Move Gen
     std::vector<uint16_t> getLegalWhitePawnMoves();
     std::vector<uint16_t> getLegalBlackPawnMoves();
 
@@ -55,6 +63,12 @@ class Board {
 
     std::vector<uint16_t> getLegalWhiteKnightMoves();
     std::vector<uint16_t> getLegalBlackKnightMoves();
+    
+
+    // Perform Move
+    uint8_t findPieceAtIndex(uint8_t from);
+    void performMove(uint16_t move);
+    void unMakeMove();
 
     void printBoard();
     void printBitBoard(uint64_t bb);
@@ -72,4 +86,16 @@ class Board {
     uint64_t blackQueens;
     uint64_t whiteKing;
     uint64_t blackKing;
+    uint64_t** bitboards = new uint64_t*[12];
+    uint8_t previousCapture = 0b00000000;
+    uint8_t previousMovedPiece = 0b00000000;
+    uint16_t previousMove = 0b0000000000000000;
+    bool canWhiteQueenCastle = 1;
+    bool canWhiteKingCastle = 1;
+    bool canBlackQueenCastle = 1;
+    bool canBlackKingCastle = 1;
+    bool previousWhiteCastleKing = 0;
+    bool previousWhiteCastleQueen = 0;
+    bool previousBlackCastleKing = 0;
+    bool previousBlackCastleQueen = 0;
 };

@@ -1,5 +1,4 @@
 #include "../board.h"
-#include <bits/stdc++.h>
 #include <bitset>
 #include <cmath>
 #include <iostream>
@@ -67,14 +66,14 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toWest, false, false, i+1, false, 0);
+          moveSet(move, from, toWest, false, false, i+1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
       } else {
         uint16_t move;
-        moveSet(move, from, toWest, false, false, 0, false, 0);
+        moveSet(move, from, toWest, false, false, 0, true, 0);
         legal.push_back(move);
       }
     }
@@ -85,14 +84,14 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toEast, false, false, i+1, false, 0);
+          moveSet(move, from, toEast, false, false, i+1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
       } else {
         uint16_t move;
-        moveSet(move, from, toEast, false, false, 0, false, 0);
+        moveSet(move, from, toEast, false, false, 0, true, 0);
         legal.push_back(move);
       }
     }
@@ -100,7 +99,7 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
     whitePawnCpy = whitePawnCpy & (~isolatedPawn);
   }
 
-  printf("%d\n", legal.size());
+  // printf("%d\n", legal.size());
   // TODO: EN PASSANT
 
   return legal;
@@ -167,14 +166,14 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toWest, false, false, i+1, false, 0);
+          moveSet(move, from, toWest, false, false, i+1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
       } else {
         uint16_t move;
-        moveSet(move, from, toWest, false, false, 0, false, 0);
+        moveSet(move, from, toWest, false, false, 0, true, 0);
         legal.push_back(move);
       }
     }
@@ -185,14 +184,14 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toEast, false, false, i+1, false, 0);
+          moveSet(move, from, toEast, false, false, i+1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
       } else {
         uint16_t move;
-        moveSet(move, from, toEast, false, false, 0, false, 0);
+        moveSet(move, from, toEast, false, false, 0, true, 0);
         legal.push_back(move);
       }
     }
@@ -200,7 +199,7 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
     blackPawnCpy = blackPawnCpy & (~isolatedPawn);
   }
 
-  printf("%d\n", legal.size());
+  // printf("%d\n", legal.size());
   // TODO: EN PASSANT
 
   return legal;

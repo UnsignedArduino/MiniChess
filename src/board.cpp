@@ -14,7 +14,7 @@ void moveSet(uint16_t &move, uint8_t from, uint8_t to, bool doublePawnPush, bool
   move |= (uint16_t)to << 6;
   uint8_t flags = 0;
   if (doublePawnPush){
-    flags = 0b001;
+    flags = 0b00000001;
   }
   else if (castle != 0){
     flags = 0b0010 + (castle - 1);
@@ -33,13 +33,13 @@ void moveSet(uint16_t &move, uint8_t from, uint8_t to, bool doublePawnPush, bool
   else if (enPassant){
     flags = 0b0101;
   }
+  
   move |= (uint16_t)flags << 12;
-  // std::bitset<16> x(move);
-  // std::cout << x << '\n';
+  
 }
 
 uint16_t movePack(uint8_t from, uint8_t to, bool doublePawnPush, bool enPassant, uint8_t promo, bool capture, uint8_t castle) {
-  uint16_t move;
+  uint16_t move = 0b0000000000000000;
   moveSet(move, from, to, doublePawnPush, enPassant, promo, capture, castle);
   return move;
 }
@@ -56,8 +56,28 @@ Board::Board() {
   this->whiteQueens = 0x0000000000000010ULL;
   this->blackQueens = 0x1000000000000000ULL;
   this->whiteKing = 0x000000000000008ULL;
-  this->blackKing = 0x800000000000000ULL;
+  this->blackKing = 0x0800000000000000ULL;
 
+  uint64_t** bitboards = new uint64_t*[12];
+  this->bitboards[0] = &this->whitePawns;
+  this->bitboards[1] = &this->whiteRooks;
+  this->bitboards[2] = &this->whiteKnights;
+  this->bitboards[3] = &this->whiteBishops;
+  this->bitboards[4] = &this->whiteQueens;
+  this->bitboards[5] = &this->whiteKing;
+  this->bitboards[6] = &this->blackPawns;
+  this->bitboards[7] = &this->blackRooks;
+  this->bitboards[8] = &this->blackKnights;
+  this->bitboards[9] = &this->blackBishops;
+  this->bitboards[10] = &this->blackQueens;
+  this->bitboards[11] = &this->blackKing;
+
+  // this->whiteQueens = 0x0ULL;
+  // this->whiteKnights = 0x0ULL;
+  // this->whiteBishops = 0x0ULL;
+  // this->blackQueens = 0x0ULL;
+  // this->blackKnights = 0x0ULL;
+  // this->blackBishops = 0x0ULL;
   // this->blackKnights >>= 32;
   // this->blackKing >>= 24;
   // this->whiteQueens <<= 24;
@@ -68,10 +88,537 @@ Board::Board() {
   // this->blackPawns = 0;
   // this->blackRooks = 0;
 
+  //this->blackPawns = 0x0ULL;
+  // this->whiteKnights <<= 48;
+  //this->whitePawns = 0x0ULL;
+  //this->blackBishops >>= 40;
+  //this->blackKnights >>= 48;
   // this->getLegalWhiteBishopMoves();
   // this->getLegalBlackQueenMoves();
   // this->getLegalBlackKingMoves();
   // this->getLegalBlackKnightMoves();
+  // printf("%d\n", this->isBlackCheck());
+}
+
+bool Board::isWhiteCheck(){
+  uint64_t explosion = 0x0ULL;
+  uint16_t from = 63 - __builtin_ctzll(whiteKing);
+  // Rook/Queen posibilities
+  explosion |= getFileAttacks(whiteKing, from); 
+  explosion |= getRankAttacks(whiteKing);
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+    if ((blackQueens & isolated) != 0 || (blackRooks & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  explosion = getDiagonalAttacks(whiteKing, from);
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+
+    if ((blackQueens & isolated) != 0 || (blackBishops & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  explosion = 0x0ULL;
+  if (from % 8 != 0){
+      explosion |= whiteKing << 17;
+      explosion |= whiteKing >> 15;
+      // Not A or B file
+      if ((from - 1) % 8 != 0){
+          explosion |= whiteKing << 10;
+          explosion |= whiteKing >> 6;
+      }
+  }
+
+  // Not H File
+  if ((from+1) % 8 != 0){
+      explosion |= whiteKing << 15;
+      explosion |= whiteKing >> 17;
+      // Not H or F File
+      if ((from+2) % 8 != 0){
+          explosion |= whiteKing << 6;
+          explosion |= whiteKing >> 10;
+      }
+  }
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+    if ((blackKnights & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  return false;
+  
+}
+
+bool Board::isBlackCheck(){
+  uint64_t explosion = 0x0ULL;
+  uint16_t from = 63 - __builtin_ctzll(blackKing);
+  // Rook/Queen posibilities
+  explosion |= getFileAttacks(blackKing, from); 
+  explosion |= getRankAttacks(blackKing);
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+    if ((whiteQueens & isolated) != 0 || (whiteRooks & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  explosion = getDiagonalAttacks(blackKing, from);
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+
+    if ((whiteQueens & isolated) != 0 || (whiteBishops & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  explosion = 0x0ULL;
+  if (from % 8 != 0){
+      explosion |= blackKing << 17;
+      explosion |= blackKing >> 15;
+      // Not A or B file
+      if ((from - 1) % 8 != 0){
+          explosion |= blackKing << 10;
+          explosion |= blackKing >> 6;
+      }
+  }
+
+  // Not H File
+  if ((from+1) % 8 != 0){
+      explosion |= blackKing << 15;
+      explosion |= blackKing >> 17;
+      // Not H or F File
+      if ((from+2) % 8 != 0){
+          explosion |= blackKing << 6;
+          explosion |= blackKing >> 10;
+      }
+  }
+  while (explosion != 0){
+    uint64_t isolated = explosion & ((~explosion) + 1);
+    if ((whiteKnights & isolated) != 0){
+      return true;
+    }
+    explosion &= ~isolated;
+  }
+  return false;
+  
+}
+
+std::vector<uint16_t> Board::legalWhiteMoves(){
+  std::vector<uint16_t> legal;
+  std::vector<uint16_t> temp = getLegalWhitePawnMoves();
+  // Test pawn moves
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalWhiteKnightMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalWhiteBishopMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalWhiteRookMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalWhiteKingMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalWhiteQueenMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isWhiteCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  // Check for Castle
+  // printf("%d\n", canWhiteKingCastle);
+  if (canWhiteKingCastle){
+    // No pieces between
+    if ((combinedOccupationBitBoard() & 0x000000000000006ULL) == 0){
+      whiteKing = 0x000000000000004ULL;
+      if (!isWhiteCheck()){
+        whiteKing = 0x000000000000002ULL;
+        if (!isWhiteCheck()){
+          legal.push_back(0b0010000001111100);
+          // printf("Castle\n");
+        }
+      }
+      whiteKing = 0x000000000000008ULL;
+    }
+  }
+  if (canWhiteQueenCastle){
+    // No pieces between
+    if ((combinedOccupationBitBoard() & 0x000000000000070ULL) == 0){
+      whiteKing = 0x000000000000008ULL << 1; // Math hard
+      if (!isWhiteCheck()){
+        whiteKing <<= 1;
+        if (!isWhiteCheck()){
+          whiteKing <<= 1;
+          if (!isWhiteCheck()){
+            legal.push_back(0b0011000001111100);
+          }
+          // printf("Castle\n");
+        }
+      }
+      whiteKing = 0x000000000000008ULL;
+    }
+  }
+  return legal;
+}
+
+
+std::vector<uint16_t> Board::legalBlackMoves(){
+  std::vector<uint16_t> legal;
+  std::vector<uint16_t> temp = getLegalBlackPawnMoves();
+  // Test pawn moves
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalBlackKnightMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalBlackBishopMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalBlackRookMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalBlackKingMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  temp.clear();
+  temp = getLegalBlackQueenMoves();
+  for (int i = 0; i < temp.size(); i++){
+    performMove(temp[i]);
+    if (!isBlackCheck()){
+      legal.push_back(temp[i]);
+    }
+    unMakeMove();
+  }
+  // Check for Castle
+  // printf("%d\n", canWhiteKingCastle);
+  if (canBlackKingCastle){
+    // No pieces between
+    if ((combinedOccupationBitBoard() & (0x000000000000006ULL << 56)) == 0){
+      blackKing = 0x000000000000004ULL << 56;
+      if (!isBlackCheck()){
+        blackKing = 0x000000000000002ULL << 56;
+        if (!isBlackCheck()){
+          legal.push_back(0b0010000000000100);
+          // printf("Castle\n");
+        }
+      }
+      blackKing = 0x000000000000008ULL << 56;
+    }
+  }
+  if (canBlackQueenCastle){
+    // No pieces between
+    if ((combinedOccupationBitBoard() & (0x000000000000070ULL << 56)) == 0){
+      blackKing = 0x000000000000008ULL << 1 << 56; // Math hard
+      if (!isWhiteCheck()){
+        blackKing <<= 1;
+        if (!isWhiteCheck()){
+          blackKing <<= 1;
+          if (!isWhiteCheck()){
+            legal.push_back(0b0011000000000100);
+          }
+          // printf("Castle\n");
+        }
+      }
+      blackKing = 0x000000000000008ULL << 56;
+    }
+  }
+  return legal;
+}
+
+
+
+
+uint8_t Board::findPieceAtIndex(uint8_t from){
+  if (bitRead(whitePawns, from) == 1){
+    return 1;
+  }
+  else if (bitRead(whiteRooks, from) == 1){
+    return 2;
+  }
+  else if (bitRead(whiteKnights, from) == 1){
+    return 3;
+  }
+  else if (bitRead(whiteBishops, from) == 1){
+    return 4;
+  }
+  else if (bitRead(whiteQueens, from) == 1){
+    return 5;
+  }
+  else if (bitRead(whiteKing, from) == 1){
+    return 6;
+  }
+  else if (bitRead(blackPawns, from) == 1){
+    return 7;
+  }
+  else if (bitRead(blackRooks, from) == 1){
+    return 8;
+  }
+  else if (bitRead(blackKnights, from) == 1){
+    return 9;
+  }
+  else if (bitRead(blackBishops, from) == 1){
+    return 10;
+  }
+  else if (bitRead(blackQueens, from) == 1){
+    return 11;
+  }
+  else if (bitRead(blackKing, from) == 1){
+    return 12;
+  }
+  return 0;
+}
+
+void Board::performMove(uint16_t move){
+  uint8_t from = move & 0b0000000000111111;
+  uint8_t to = (move & 0b0000111111000000) >> 6;
+  uint8_t flag = (move & 0b1111000000000000) >> 12;
+  uint64_t fromMask = 0x01ULL << (63-from);
+  uint64_t toMask = 0x01ULL << (63-to);
+  uint8_t fromPiece = findPieceAtIndex(from);
+  previousMovedPiece = fromPiece;
+  // Move piece from its bitboard to its new position
+  
+  //If there was a capture, remove the captured piece
+  if (flag == 0b0100 || flag >= 0b1100){
+    uint8_t toBeCaptured = findPieceAtIndex(to);
+    // printf("Capturing: %d\n", to);
+    *bitboards[toBeCaptured-1] = (*bitboards[toBeCaptured-1] & (~toMask));
+    previousCapture = toBeCaptured;
+  }
+  
+  // knight Promo
+  // std::bitset<8> x(flag);
+  // std::cout << "Flag:" << x << "\n";
+  // printf("%d\n", fromPiece);
+  if (flag == 0b1000 || flag == 0b1100){
+    // Remove piece
+    *bitboards[fromPiece-1] &= ~fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 2 : 8] |= toMask;
+  }
+  else if (flag == 0b1001 || flag == 0b1101){
+    // Remove piece
+    *bitboards[fromPiece-1] &= ~fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 3 : 9] |= toMask;
+  }
+  else if (flag == 0b1010 || flag == 0b1110){
+    // Remove piece
+    *bitboards[fromPiece-1] &= ~fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 1 : 7] |= toMask;
+  }
+  else if (flag == 0b1011 || flag == 0b1111){
+    // Remove piece
+    *bitboards[fromPiece-1] &= ~fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 4 : 10] |= toMask;
+  }
+  else  if (flag != 0b0010 && flag == 0b0011){
+    // Move Origin piece to its new spot
+    *bitboards[fromPiece-1] = (*bitboards[fromPiece-1] & (~fromMask)) | toMask;
+  }
+
+  if (flag == 0b0010){
+    if (fromPiece <= 6){
+      whiteKing = 0x000000000000002ULL;
+      whiteRooks &= ~0x000000000000001ULL;
+      whiteRooks |= 0x000000000000004ULL;
+    }
+    else{
+      blackKing = 0x0800000000000000ULL >> 2;
+      blackRooks &= ~(0x0800000000000000ULL >> 3);
+      blackRooks |= 0x0800000000000000ULL >> 1;
+    }
+  }
+  if (flag == 0b0011){
+    if (fromPiece <= 6){
+      whiteKing = 0x000000000000008ULL << 2;
+      whiteRooks &= ~0x000000000000080ULL;
+      whiteRooks |= 0x000000000000008ULL << 1;
+    }
+    else{
+      blackKing = 0x0800000000000000ULL << 2;
+      blackRooks &= ~0x8000000000000000ULL;
+      blackRooks |= 0x0800000000000000ULL << 1;
+    }
+    
+  }
+  previousMove = move;
+
+  // Figure out castling flags
+  if (bitRead(whiteRooks, 63) != 1 || whiteKing != 0x000000000000008ULL){
+    canWhiteKingCastle = 0;
+    previousWhiteCastleKing = 1;
+  }
+  if (bitRead(whiteRooks, 56) != 1 || whiteKing != 0x000000000000008ULL){
+    canWhiteQueenCastle = 0;
+    previousWhiteCastleQueen = 1;
+  }
+  if (bitRead(blackRooks, 7) != 1 || blackKing != 0x0800000000000000ULL){
+    canBlackKingCastle = 0;
+    previousBlackCastleKing = 1;
+  }
+  if (bitRead(blackRooks, 0) != 1 || blackKing != 0x0800000000000000ULL){
+    canBlackQueenCastle = 0;
+    previousBlackCastleQueen = 1;
+  }
+
+  // printBitBoard(whitePawns);
+  // printBitBoard(blackPawns);
+}
+
+void Board::unMakeMove(){
+  uint8_t from = previousMove & 0b0000000000111111;
+  uint8_t to = (previousMove & 0b0000111111000000) >> 6;
+  uint8_t flag = (previousMove & 0b1111000000000000) >> 12;
+  uint64_t fromMask = 0x01ULL << (63-from);
+  uint64_t toMask = 0x01ULL << (63-to);
+  uint8_t fromPiece = previousMovedPiece;
+
+  //If there was a capture, remove the captured piece
+  if (flag == 0b0100 || flag >= 0b1100){
+    uint8_t toBeCaptured = previousCapture;
+    // printf("Capturing: %d\n", to);
+    *bitboards[toBeCaptured-1] = (*bitboards[toBeCaptured-1] | toMask);
+  }
+  
+  // knight Promo
+  // std::bitset<8> x(flag);
+  // std::cout << "Flag:" << x << "\n";
+  if (flag == 0b1000 || flag == 0b1100){
+    // Remove piece
+    *bitboards[fromPiece-1] |= fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 2 : 8] &= ~toMask;
+  }
+  else if (flag == 0b1001 || flag == 0b1101){
+    // Remove piece
+    *bitboards[fromPiece-1] |= fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 3 : 9] &= ~toMask;
+  }
+  else if (flag == 0b1010 || flag == 0b1110){
+    // Remove piece
+    *bitboards[fromPiece-1] |= fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 1 : 7] &= ~toMask;
+  }
+  else if (flag == 0b1011 || flag == 0b1111){
+    // Remove piece
+    *bitboards[fromPiece-1] |= fromMask;
+    // Replace with promotion
+    *bitboards[fromPiece <= 6 ? 4 : 10] &= ~toMask;
+  }
+  else if (!previousWhiteCastleKing && !previousWhiteCastleQueen && !previousBlackCastleKing && !previousBlackCastleQueen){
+    // Move Origin piece to its new spot
+    
+    *bitboards[fromPiece-1] = (*bitboards[fromPiece-1] & (~toMask)) | fromMask;
+  }
+
+
+  // Figure out castling flags
+  if (previousWhiteCastleKing){
+    canWhiteKingCastle = 1;
+    whiteKing = 0x000000000000008ULL;
+    whiteRooks &= ~0x000000000000004ULL;
+    whiteRooks |= 0x000000000000001ULL;
+  }
+  if (previousWhiteCastleQueen){
+    canWhiteQueenCastle = 1;
+    whiteKing = 0x000000000000008ULL;
+    whiteRooks &= ~(0x000000000000008ULL << 1);
+    whiteRooks |= 0x000000000000080ULL;
+  }
+  if (previousBlackCastleKing){
+    canBlackKingCastle = 1;
+    
+    blackKing = 0x0800000000000000ULL;
+    blackRooks &= ~(0x0800000000000000ULL >> 1);
+    blackRooks |= 0x0800000000000000ULL >> 3;
+    
+  }
+  if (previousBlackCastleQueen){
+    canBlackQueenCastle = 1;
+    blackKing = 0x0800000000000000ULL;
+    blackRooks &= ~(0x0800000000000000ULL << 1);
+    blackRooks |= 0x0800000000000000ULL << 4;
+  }
+  previousWhiteCastleKing = 0;
+  previousWhiteCastleQueen = 0;
+  previousBlackCastleKing = 0;
+  previousBlackCastleQueen = 0;
+  previousCapture = 0b00000000;
+  previousMovedPiece = 0b00000000;
+  previousMove = 0b0000000000000000;
 }
 
 bool Board::pieceAtIndex(uint8_t i) {
