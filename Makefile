@@ -16,5 +16,8 @@ main: $(SRCS) $(HEADERS)
 main-debug: $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -O0 $(SRCS) -o "$@"
 
+format:
+	clang-format -i $(SRCS) $(HEADERS)
+
 clean:
 	del main.exe main-debug.exe

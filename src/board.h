@@ -16,8 +16,10 @@
 #define moveReadFromIndex(move) (move & 0b111111)
 #define moveReadToIndex(move) (move & 0b111111000000)
 #define moveReadPromotion(move) (move & 0b11000000000000)
-void moveSet(uint16_t &move, uint8_t from, uint8_t to, bool doublePawnPush, bool enPassant, uint8_t promo, bool capture, uint8_t castle);
-uint16_t movePack(uint8_t from, uint8_t to, bool doublePawnPush, bool enPassant, uint8_t promo, bool capture, uint8_t castle);
+void moveSet(uint16_t& move, uint8_t from, uint8_t to, bool doublePawnPush, bool enPassant, uint8_t promo, bool capture,
+             uint8_t castle);
+uint16_t movePack(uint8_t from, uint8_t to, bool doublePawnPush, bool enPassant, uint8_t promo, bool capture,
+                  uint8_t castle);
 
 class Board {
   public:
@@ -43,7 +45,6 @@ class Board {
     uint64_t getFileAttacks(uint64_t bitMask, uint16_t from);
     uint64_t getRankAttacks(uint64_t bitMask);
     uint64_t getDiagonalAttacks(uint64_t bitMask, uint16_t from);
-    
 
     // Move Gen
     std::vector<uint16_t> getLegalWhitePawnMoves();
@@ -63,7 +64,6 @@ class Board {
 
     std::vector<uint16_t> getLegalWhiteKnightMoves();
     std::vector<uint16_t> getLegalBlackKnightMoves();
-    
 
     // Perform Move
     uint8_t findPieceAtIndex(uint8_t from);
@@ -73,7 +73,6 @@ class Board {
     void printBoard();
     void printBitBoard(uint64_t bb);
 
-  
     uint64_t whitePawns;
     uint64_t blackPawns;
     uint64_t whiteKnights;
