@@ -1,10 +1,10 @@
 all: main
 
-CXX = clang++
-override CXXFLAGS += -g -Wno-everything
+CXX = g++
+override CXXFLAGS += -g -Wall -Wextra -pedantic
 
-SRCS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.cpp' -print | sed -e 's/ /\\ /g')
-HEADERS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print)
+SRCS = $(shell dir /A-D /B /S *.cpp)
+HEADERS = $(shell dir /A-D /B /S *.h)
 
 main: $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(SRCS) -o "$@"
@@ -13,4 +13,4 @@ main-debug: $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -O0 $(SRCS) -o "$@"
 
 clean:
-	rm -f main main-debug
+	del main.exe main-debug.exe
