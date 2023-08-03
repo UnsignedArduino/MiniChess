@@ -1,7 +1,11 @@
 all: main
 
 CXX = g++
-override CXXFLAGS += -g -Wall -Wextra -pedantic
+override CXXFLAGS += -g -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wformat=2 -Winit-self \
+						-Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast \
+						-Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo \
+						-Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef \
+						-Wno-unused # -Wdisabled-optimization -Werror
 
 SRCS = $(shell dir /A-D /B /S *.cpp)
 HEADERS = $(shell dir /A-D /B /S *.h)
