@@ -50,6 +50,7 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
         // Otherwise can only move up 1 square
       } else {
         legal.push_back(movePack(from, to, false, false, 0, false, 0));
+        
       }
     }
 

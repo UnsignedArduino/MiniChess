@@ -87,20 +87,26 @@ class Board {
     uint64_t whiteKing;
     uint64_t blackKing;
     uint64_t** bitboards = new uint64_t*[12];
-    uint8_t previousCapture = 0b00000000;
-    uint8_t previousMovedPiece = 0b00000000;
-    uint16_t previousMove = 0b0000000000000000;
+
+    int deep = 0;
+    std::vector<uint8_t> previousCapture = {0b00000000};
+    std::vector<uint8_t> previousMovedPiece = {0b00000000};
+    std::vector<uint16_t> previousMove = {0b0000000000000000};
+
+    bool whosMove = 0; //White 0, Black 1
+
     bool canWhiteQueenCastle = 1;
     bool canWhiteKingCastle = 1;
     bool canBlackQueenCastle = 1;
     bool canBlackKingCastle = 1;
-    bool previousWhiteCastleKing = 0;
-    bool previousWhiteCastleQueen = 0;
-    bool previousBlackCastleKing = 0;
-    bool previousBlackCastleQueen = 0;
 
-    bool canPrevWhiteCastleKing = 0;
-    bool canPrevWhiteCastleQueen = 0;
-    bool canPrevBlackCastleKing = 0;
-    bool canPrevBlackCastleQueen = 0;
+    std::vector<bool> previousWhiteCastleKing = {0};
+    std::vector<bool> previousWhiteCastleQueen = {0};
+    std::vector<bool> previousBlackCastleKing = {0};
+    std::vector<bool> previousBlackCastleQueen = {0};
+
+    std::vector<bool> canPrevWhiteCastleKing = {0};
+    std::vector<bool> canPrevWhiteCastleQueen = {0};
+    std::vector<bool> canPrevBlackCastleKing = {0};
+    std::vector<bool> canPrevBlackCastleQueen = {0};
 };
