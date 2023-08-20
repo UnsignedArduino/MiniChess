@@ -14,8 +14,7 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
   // Isolated pawn BB
   // Set all bits to 0 besides the LS 1
   while (whitePawnCpy != 0) {
-    uint64_t isolatedPawn =
-        whitePawnCpy & ((~whitePawnCpy) + 1); // Black Magic;
+    uint64_t isolatedPawn = whitePawnCpy & ((~whitePawnCpy) + 1); // Black Magic;
 
     // Check through all the other BBs and make sure no piece is in
     // front of this pawn
@@ -36,14 +35,13 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, to, false, false, i+1, false, 0);
+          moveSet(move, from, to, false, false, i + 1, false, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
         // Step 4: Check if we can jump 2 squares
-      } else if (from >= 48 && from <= 55 &&
-                 !this->pieceAtBitBoard(possibleExtraPawnPush)) {
+      } else if (from >= 48 && from <= 55 && !this->pieceAtBitBoard(possibleExtraPawnPush)) {
         const uint8_t extraTo = 63 - __builtin_ctzll(possibleExtraPawnPush);
         legal.push_back(movePack(from, to, false, false, 0, false, 0));
         legal.push_back(movePack(from, extraTo, true, false, 0, false, 0));
@@ -60,14 +58,13 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
 
     uint8_t toWest = 63 - __builtin_ctzll(possibleNorthWestCapture);
     uint8_t toEast = 63 - __builtin_ctzll(possibleNorthEastCapture);
-    if (this->blackPieceAtBitBoard(possibleNorthWestCapture) &&
-        (from) % 8 != 0) {
+    if (this->blackPieceAtBitBoard(possibleNorthWestCapture) && (from) % 8 != 0) {
       const bool canPromote = toWest < 8;
 
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toWest, false, false, i+1, true, 0);
+          moveSet(move, from, toWest, false, false, i + 1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
@@ -78,14 +75,13 @@ std::vector<uint16_t> Board::getLegalWhitePawnMoves() {
         legal.push_back(move);
       }
     }
-    if (this->blackPieceAtBitBoard(possibleNorthEastCapture) &&
-        (from + 1) % 8 != 0) {
+    if (this->blackPieceAtBitBoard(possibleNorthEastCapture) && (from + 1) % 8 != 0) {
       const bool canPromote = toEast < 8;
 
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toEast, false, false, i+1, true, 0);
+          moveSet(move, from, toEast, false, false, i + 1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
@@ -114,8 +110,7 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
   // Isolated pawn BB
   // Set all bits to 0 besides the LS 1
   while (blackPawnCpy != 0) {
-    uint64_t isolatedPawn =
-        blackPawnCpy & ((~blackPawnCpy) + 1); // Black Magic;
+    uint64_t isolatedPawn = blackPawnCpy & ((~blackPawnCpy) + 1); // Black Magic;
 
     // Check through all the other BBs and make sure no piece is in
     // front of this pawn
@@ -125,7 +120,7 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
     const uint64_t possibleExtraPawnPush = possiblePawnPush >> 8;
 
     const uint8_t from = 63 - __builtin_ctzll(isolatedPawn);
-    
+
     // Use & to see if any other BB has a 1 there
     if (!this->pieceAtBitBoard(possiblePawnPush)) {
       // Step 1: Find index of origin square (isolatedPawn)
@@ -137,14 +132,13 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, to, false, false, i+1, false, 0);
+          moveSet(move, from, to, false, false, i + 1, false, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
         }
         // Step 4: Check if we can jump 2 squares
-      } else if (from >= 8 && from <= 15 &&
-                 !this->pieceAtBitBoard(possibleExtraPawnPush)) {
+      } else if (from >= 8 && from <= 15 && !this->pieceAtBitBoard(possibleExtraPawnPush)) {
         const uint8_t extraTo = 63 - __builtin_ctzll(possibleExtraPawnPush);
         legal.push_back(movePack(from, to, false, false, 0, false, 0));
         legal.push_back(movePack(from, extraTo, true, false, 0, false, 0));
@@ -160,14 +154,13 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
 
     uint8_t toWest = 63 - __builtin_ctzll(possibleSouthWestCapture);
     uint8_t toEast = 63 - __builtin_ctzll(possibleSouthEastCapture);
-    if (this->whitePieceAtBitBoard(possibleSouthWestCapture) &&
-        (from) % 8 != 0) {
+    if (this->whitePieceAtBitBoard(possibleSouthWestCapture) && (from) % 8 != 0) {
       const bool canPromote = toWest > 55;
 
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toWest, false, false, i+1, true, 0);
+          moveSet(move, from, toWest, false, false, i + 1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
@@ -178,14 +171,13 @@ std::vector<uint16_t> Board::getLegalBlackPawnMoves() {
         legal.push_back(move);
       }
     }
-    if (this->whitePieceAtBitBoard(possibleSouthEastCapture) &&
-        (from + 1) % 8 != 0) {
+    if (this->whitePieceAtBitBoard(possibleSouthEastCapture) && (from + 1) % 8 != 0) {
       const bool canPromote = toEast > 55;
 
       if (canPromote) {
         uint16_t move;
         for (uint8_t i = 0; i < 4; i++) {
-          moveSet(move, from, toEast, false, false, i+1, true, 0);
+          moveSet(move, from, toEast, false, false, i + 1, true, 0);
           // std::bitset<16> x(move);
           // std::cout << x << '\n';
           legal.push_back(move);
