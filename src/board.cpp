@@ -73,7 +73,8 @@ Board::Board() {
   // this->blackQueens = 0x0ULL;
   // this->blackKnights = 0x0ULL;
   //this->blackBishops = 0x0ULL;
-  this->blackKnights >>= 40;
+  //this->blackKnights >>= 40;
+  //this->whiteKnights <<= 40;
   // this->blackKing >>= 24;
   // this->whiteQueens <<= 24;
   // this->whiteBishops = 0x0000000000000024ULL << 24;
@@ -468,17 +469,17 @@ void Board::performMove(uint16_t move){
   
   // The Witch-King of Angmar has cursed this code with the poison of the Morgul Blade
   // DO NOT TOUCH IT IF YOU WISH TO LIVE
-  previousWhiteCastleKing.push_back(previousWhiteCastleKing[deep]);
-  canPrevWhiteCastleKing.push_back(canPrevWhiteCastleKing[deep]);
+  previousWhiteCastleKing.push_back(previousWhiteCastleKing[deep-1]);
+  canPrevWhiteCastleKing.push_back(canPrevWhiteCastleKing[deep-1]);
 
-  previousBlackCastleKing.push_back(previousBlackCastleKing[deep]);
-  canPrevBlackCastleKing.push_back(canPrevBlackCastleKing[deep]);
+  previousBlackCastleKing.push_back(previousBlackCastleKing[deep-1]);
+  canPrevBlackCastleKing.push_back(canPrevBlackCastleKing[deep-1]);
   
-  previousWhiteCastleQueen.push_back(previousWhiteCastleQueen[deep]);
-  canPrevWhiteCastleQueen.push_back(canPrevWhiteCastleQueen[deep]);
+  previousWhiteCastleQueen.push_back(previousWhiteCastleQueen[deep-1]);
+  canPrevWhiteCastleQueen.push_back(canPrevWhiteCastleQueen[deep-1]);
 
-  previousBlackCastleQueen.push_back(previousBlackCastleQueen[deep]);
-  canPrevBlackCastleQueen.push_back(canPrevBlackCastleQueen[deep]);
+  previousBlackCastleQueen.push_back(previousBlackCastleQueen[deep-1]);
+  canPrevBlackCastleQueen.push_back(canPrevBlackCastleQueen[deep-1]);
   if (flag == 0b0010){
     if (fromPiece <= 6){
       whiteKing = 0x000000000000002ULL;

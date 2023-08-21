@@ -14,7 +14,7 @@ uint64_t popcount64c(uint64_t x)
     return (x * 0x0101010101010101ULL) >> 56;  //returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ... 
 }
 
-uint16_t evaluate(Board &board){
+int16_t evaluate(Board &board){
     // Attempt Chess 4.5 MS system
     // Material points, 10, 32, 35, 50, 90
     // pawn, knight, bishop, rook, queen
@@ -42,30 +42,64 @@ uint16_t evaluate(Board &board){
     if (board.whosMove == 1){
         MS = whiteMaterial > blackMaterial ? -MS : MS;
     }
+    //MS = whiteMaterial > blackMaterial ? MS : -MS;
     // printf("MS: %d\n", MS);
     return MS;
 }
 
-int negaMax(Board &b, int alpha, int beta, uint8_t depth, bool base){
+// int negaScout(Board &b, int alpha, int beta, uint8_t depth){
+//     if (depth == 0) return evaluate(b);
+    
+//     std::vector<uint16_t> moves = b.whosMove == 0 ? b.legalWhiteMoves() : b.legalBlackMoves();
+//     int a, B, t, i;
+//     B = beta;
+//     a = alpha;
+//     for (int i=0;i<moves.size();i++){
+//         b.performMove(moves[i]);
+//         // std::cout << "Turn: " << b.whosMove << " Move: "<< moves[i] <<"\n";
+//         // b.printBoard();
+//         t = -negaScout(b, -B, -alpha, depth-1);
+//         if ((t > a) && (t < beta) && (i > 0)){
+//             t = -negaScout(b, -beta, -alpha, depth - 1);
+//         }
+//         b.unMakeMove();
+//         alpha = std::max( alpha, t );
+//         if ( alpha >= beta )
+//             return alpha;                            /* cut-off */
+//         B = alpha + 1;        
+//     }
+//     return alpha;
+// }
+// int negaMax(Board &b, int alpha, int beta, uint8_t depth){
+//     if (depth == 0)
+//         return evaluate(b);
+    
+//     int value = -100000;
+//     std::vector<uint16_t> moves = b.whosMove == 0 ? b.legalWhiteMoves() : b.legalBlackMoves();
+//     for (int i=0;i<moves.size();i++){
+//         b.performMove(moves[i]);
+//         value = std::max(value, -negaMax(b, -beta, -alpha, depth - 1));
+//         alpha = std::max(alpha, value);
+//         if (alpha > beta){
+//             break;
+//         }
+//         b.unMakeMove();
+//     }
+//     return value;
+// }
+int alphaBeta(Board &b, int alpha, int beta, uint8_t depth){
     if (depth == 0) return evaluate(b);
-    //std::cout << "Turn: " << b.whosMove << "\n";
-    //b.printBitBoard(b.whitePawns);
     std::vector<uint16_t> moves = b.whosMove == 0 ? b.legalWhiteMoves() : b.legalBlackMoves();
     for (int i=0;i<moves.size();i++){
         b.performMove(moves[i]);
-        // std::bitset<16> x(moves[i]);
-        // std::cout << "Move:" << x << " Turn: " << b.whosMove << "\n";
-        // b.printBitBoard(b.whitePawns);
-        int score = -negaMax(b, -beta, -alpha, depth - 1, 0);
+        // std::cout << "Turn: " << b.whosMove << " Move: "<< moves[i] <<"\n";
+        // b.printBoard();
+        int score = -alphaBeta(b, -beta, -alpha, depth-1);
         b.unMakeMove();
-        // printf("Score: %d\n", score);
-        if (score >= beta){
-            //printf("Beta cuttoff\n");
-            return beta;
-        }
-        if (score > alpha){
-            alpha = score;
-        }
+        if( score >= beta )
+         return beta;   //  fail hard beta-cutoff
+        if( score > alpha )
+            alpha = score; // alpha acts like max in MiniMax  
     }
     return alpha;
 }

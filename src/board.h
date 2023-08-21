@@ -92,7 +92,7 @@ class Board {
     std::vector<uint8_t> previousMovedPiece = {0b00000000};
     std::vector<uint16_t> previousMove = {0b0000000000000000};
 
-    bool whosMove = 0; //White 0, Black 1
+    bool whosMove = 1; //White 0, Black 1
 
     bool canWhiteQueenCastle = 1;
     bool canWhiteKingCastle = 1;
